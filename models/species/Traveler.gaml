@@ -10,8 +10,15 @@ model switch_biasedAgents
 
 species traveler {
 	int id;
-	int fitness;
+	float fitness;
+	float work_dist;
 	string choice;
+	
+	init {
+		id <- length(species(self).population);
+		fitness <- gauss_rnd(50,5);
+		work_dist <- rnd(20.0);
+	}
 	
 }
 
