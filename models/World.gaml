@@ -8,8 +8,7 @@
 model switch_biasedAgents
 
 import "species/Traveler.gaml"
-
-
+import "species/Context.gaml"
 
 
 global {
@@ -17,7 +16,7 @@ global {
 	
 	// false si changement environnement non pris en compte, true sinon 
 	// Sert à éviter que le reflexe de modifier les notes soit appelé en boucle
-	bool modif <- false;
+	bool modif;
 	
 	// Déclaration des variables qualitatives d'environnement 
 	bool rainy;
@@ -37,6 +36,9 @@ global {
 	float walkSpeed;
 	float busSpeed;
 
+	float proportion_conf;
+	float proportion_forb;
+	float proportion_est;
 	
 	// map qui associe chaque moyen de transport une liste de notes correspondant à 
 	// [ecologie, confort, économie,sécurité, praticité, rapidité]
@@ -48,17 +50,23 @@ global {
 												
 	init {
 		create traveler number: nbrTraveler;
+		create context number: 1;
+		do modif_agents_attributs;
 	}
 	
 	
-	reflex modify_marks_env when: modif=false{
+	reflex modify_marks_env when: modif=true{
+		
+		////////////////////////////////////////////////////////////
+		// !!!!! FAIRE LES CAS OU ON RETOURNE A LA NORMALE !!!!!!!
+		/////////////////////////////////////////////////////////////
 		list<float> bike_marks <- marks["bike"];
 		list<float> walk_marks <- marks["walk"];
 		list<float> car_marks <- marks["car"];
 		list<float> bus_marks <- marks["bus"];
 		
 		// Modification des notes des moyens de transport en cas de pluie
-		if(rainy = true) {
+		if(rainy = true and rainy != context.population[0].was_rainy) {
 			write("rainy");
 			// Le vélo devient moins confortable et plus dangereux
 			put bike_marks[1]/2 in: bike_marks at: 1;
@@ -72,10 +80,11 @@ global {
 			// La voiture devient plus dangereuse 
 			put car_marks[3]/2 in: car_marks at: 3 ;
 			put car_marks in: marks at: "car";
+			context.population[0].was_rainy <- true;
 		}
 		
 		// Modification des notes des moyens de transport en cas de mauvaise température
-		if(temperatureOk=false) {
+		if(temperatureOk=false and context.population[0].was_temperatureOk != temperatureOk) {
 			// Le vélo devient moins confortable 
 			put bike_marks[1]/2 in: bike_marks at: 1;
 			put bike_marks in: marks at: "bike";
@@ -83,10 +92,12 @@ global {
 			// La marche devient moins conforatble 
 			put walk_marks[1]/2 in: walk_marks at: 1;
 			put walk_marks in: marks at: "walk";
+			
+			context.population[0].was_temperatureOk <- false;
 		}
-	
+		
 		// Modification des notes des moyens de transport quand il fait nuit
-		if(temperatureOk=false) {
+		if(light=false and context.population[0].was_light != light) {
 			// Le vélo devient plus dangereux
 			put bike_marks[3]/2 in: bike_marks at: 3;
 			put bike_marks in: marks at: "bike";
@@ -98,50 +109,75 @@ global {
 			// La voiture devient plus dangereuse 
 			put car_marks[3]/2 in: car_marks at: 3 ;
 			put car_marks in: marks at: "car";
+			context.population[0].was_light <- false;
 		}
 	
 		// Modification des notes des moyens de transport quand nous sommes en ville
-		if (city=true) {
+		if (city=true and context.population[0].was_city != city) {
 			// La voiture devient moins rapide et moins pratique  
 			put car_marks[4]/2 in: car_marks at: 4 ;
 			put car_marks[5]/2 in: car_marks at: 5 ;
 			put car_marks in: marks at: "car";
+			context.population[0].was_city <- true;
 		}
 	
 		// Modification des notes des moyens de transport quand nous sommes en ville
-		if (rush_hour=true) {
+		if (rush_hour=true and context.population[0].was_rush_hour != rush_hour) {
 			// La voiture devient moins rapide et moins pratique  
 			put car_marks[4]/2 in: car_marks at: 4 ;
 			put car_marks in: marks at: "car";
+			context.population[0].was_rush_hour <- true;
+			
 		}
 		
 		// La voiture devaint plus cher quand le prix de l'escence augmente et inversement
-		put car_marks[2]*(1.95/gasPrice) in: car_marks at: 2;
+		put car_marks[2]*(context.population[0].gasPriceRef/gasPrice) in: car_marks at: 2;
 		
 		// Le bus devient plus cher quand le prix de l'abonnement augmente et inversement
-		put bus_marks[2]*(65.5/subPrice) in: bus_marks at: 2;
+		put bus_marks[2]*(context.population[0].subPriceRef/subPrice) in: bus_marks at: 2;
 		
 		// Le vélo devient plus sûr et plus rapide quand la proportion d'axe équipés de pistes cyclable augmente
-		put bike_marks[3]*(ratioCycleWay/50.0) in: bike_marks at:3;
-		put bike_marks[5]*(ratioCycleWay/50.0) in: bike_marks at:5;
+		put bike_marks[3]*(ratioCycleWay/context.population[0].ratioCycleWayRef) in: bike_marks at:3;
+		put bike_marks[5]*(ratioCycleWay/context.population[0].ratioCycleWayRef) in: bike_marks at:5;
 		
 		// Le bus devient plus rapide quand la fréquence de passage augmente 
-		put bus_marks[5]*(busFrequency/10.0) in: bus_marks at: 5;
+		put bus_marks[5]*(busFrequency/context.population[0].busFrequencyRef) in: bus_marks at: 5;
 		
 		// Le bus devient plus confortable quand la capacité augmente 
-		put bus_marks[1]*(busCapacity/100.0) in: bus_marks at: 5;
+		put bus_marks[1]*(busCapacity/context.population[0].busCapacityRef) in: bus_marks at: 5;
 		
 		// Augmentation de la rapidité des moyens de transport avec leur vitesse 
-		put walk_marks[5]*(walkSpeed/6.4) in: walk_marks at: 5;
-		put bus_marks[5]*(busSpeed/10.0) in: bus_marks at: 5;
-		put car_marks[5]*(carSpeed/42.3) in: car_marks at: 5;
-		put bike_marks[5]*(bikeSpeed/14.0) in: bike_marks at: 5;
+		put walk_marks[5]*(walkSpeed/context.population[0].walkSpeedRef) in: walk_marks at: 5;
+		put bus_marks[5]*(busSpeed/context.population[0].busSpeedRef) in: bus_marks at: 5;
+		put car_marks[5]*(carSpeed/context.population[0].carSpeedRef) in: car_marks at: 5;
+		put bike_marks[5]*(bikeSpeed/context.population[0].bikeSpeedRef) in: bike_marks at: 5;
 		
+		context.population[0].gasPriceRef <- gasPrice;
+		context.population[0].subPriceRef <- subPrice ;
+		context.population[0].ratioCycleWayRef <- ratioCycleWay;
+		context.population[0].busFrequencyRef<-busFrequency;
+		context.population[0].busCapacityRef<- busCapacity;
+		context.population[0].carSpeedRef <- carSpeed;
+		context.population[0].bikeSpeedRef <- bikeSpeed;
+		context.population[0].walkSpeedRef <- walkSpeed;
+		context.population[0].busSpeedRef <- busSpeed;
 		
-		modif <- true;
+		do modif_agents_attributs;
+		modif <- false;
 	}
 	
-
+	action modif_agents_attributs {
+		list agents <- traveler.population; 
+		loop i from: 0 to: length(agents) - 1 { 
+			agents[i].personal_marks <- marks;
+			agents[i].proportion_conf <- proportion_conf;
+			agents[i].proportion_forb <- proportion_forb;
+			agents[i].proportion_est <- proportion_est;
+			
+     	}		
+	}
+	
+	
 }
 
 
@@ -167,19 +203,16 @@ experiment switch type: gui {
 	parameter "What is the bus average speed ? (km/h)" category:"Environnement" var: busSpeed init: 10.0;
 	parameter "What is the walking average speed ? (km/h)" category:"Environnement" var: walkSpeed init: 6.4;
 	
+	parameter "What is the proportion affected by the confirmation bias ?" category:"Bias proportions" var: proportion_conf init: 0.5;
+	parameter "What is the proportion affected by the forbidden choice bias ?" category:"Bias proportions" var: proportion_forb init: 0.5;
+	parameter "What is the proportion affected by the under/over estimation bias ?" category:"Bias proportions" var: proportion_est init: 0.5;	
+	
+	parameter "Would you like to confirm your modification ?" category: confirmation var: modif <- true among:[false,true];
 	output {
 		
 	}
 	 
 }
-	
-	
-
-	
-
-
-
-
 
 /* Insert your model definition here */
 
