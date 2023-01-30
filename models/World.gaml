@@ -40,6 +40,8 @@ global {
 	float proportion_forb;
 	float proportion_est;
 	
+	map<string, int> res;
+	
 	// map qui associe chaque moyen de transport une liste de notes correspondant à 
 	// [ecologie, confort, économie,sécurité, praticité, rapidité]
 	map<string, list<float>> marks <- create_map(["bike", "car", "bus", "walk"],
@@ -52,6 +54,7 @@ global {
 		create traveler number: nbrTraveler;
 		create context number: 1;
 		do modif_agents_attributs;
+		
 	}
 	
 	
@@ -177,6 +180,13 @@ global {
      	}		
 	}
 	
+	reflex get_results {
+		res <- create_map(["bike","car","bus","walk"],[0,0,0,0]);
+		loop trav over: traveler.population {
+			put res[trav.choice]+1 in: res at: trav.choice;
+		}
+	}
+	
 	
 }
 
@@ -209,7 +219,14 @@ experiment switch type: gui {
 	
 	parameter "Would you like to confirm your modification ?" category: confirmation var: modif <- true among:[false,true];
 	output {
-		
+		display "results" {
+        chart "results" type: series {
+            data "bike" value: res["bike"] color: #red;
+            data "car" value: res["car"] color: #blue;
+            data "bus" value: res["bus"] color: #green;
+            data "walk" value: res["walk"] color: #purple;
+        }
+    }
 	}
 	 
 }

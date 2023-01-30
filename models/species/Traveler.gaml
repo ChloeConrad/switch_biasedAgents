@@ -19,13 +19,13 @@ species traveler {
 	float proportion_forb;
 	float proportion_est;
 	// représente les choix déjà effectué par l'agent [nbrChoixVélo, nbrChoixVoiture, nbrChoixBus, nbrChoixMarche]
-	list<int> habits;
+	map<string, int> habits;
 	
 	init {
 		id <- length(species(self).population);
 		fitness <- rnd(100.0);
-		work_dist <- rnd(30.0);
-		habits <- [0,0,0,0];
+		work_dist <- rnd(20.0);
+		habits <- create_map(["bike","car","bus","walk"],[0,0,0,0]);
 	}
 	
 	action apply_conf_bias {
@@ -55,7 +55,21 @@ species traveler {
 		}
 		do ban_with_distance;
 		
-		
+		float max_somme <- -1.0;
+		string transp_max_somme;
+		loop transp over: ["bike", "car", "bus", "walk"] {
+			float somme <- 0.0;
+			list<float> marks <- personal_marks[transp];
+			loop mark over: marks {
+				somme <- somme + mark;
+			}
+			if(somme > max_somme) {
+				max_somme <- somme;
+				transp_max_somme <- transp;
+			}
+		}
+		put  habits[transp_max_somme]+1 in: habits at: transp_max_somme;
+		choice <- transp_max_somme;
 		
 	}
 	
