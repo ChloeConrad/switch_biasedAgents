@@ -9,11 +9,14 @@
 model switch_biasedAgents
 
 species traveler {
+	
+	
 	int id;
 	float fitness;
 	float work_dist;
 	string choice;
 	map<string, list<float>> personal_marks;
+	map<string, float> criteria_preference;
 	
 	float proportion_conf;
 	float proportion_forb;
@@ -22,44 +25,108 @@ species traveler {
 	map<string, int> habits;
 	
 	init {
-		id <- length(species(self).population);
+		id <- rnd(200);
 		fitness <- rnd(100.0);
 		work_dist <- rnd(20.0);
-		habits <- create_map(["bike","car","bus","walk"],[0,0,0,0]);
+		personal_marks <- create_map(["bike", "car", "bus", "walk"],
+									[[1.0,0.25,1.0,0.25,0.75,0.75],
+									[0.25,1.0,0.25,0.5,1.0,1.0],
+									[0.5,0.75,0.5,1.0,0.75,0.5],
+									[1.0,0.5,1.0,0.75,0.5,0.25]]);
+									
+		habits <- create_map(["bike","car","bus","walk"],[rnd(10),rnd(10),rnd(10),rnd(10)]);
+		criteria_preference <- create_map(["ecology", "comfort", "cheap", "safety", "praticity", "fast"],[rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0)]);
 	}
 	
 	action apply_conf_bias {
+		int max <- -1;
+		string max_choice_transp;
+		loop transp over: ["bike", "car", "bus", "walk"] {
+			if(self.habits[transp]>max){
+				max <- self.habits[transp];
+				max_choice_transp <- transp;
+			}
+		}
 		
+		loop transp over: ["bike", "car", "bus", "walk"] {
+			list<float> marks <- self.personal_marks[transp];
+			loop i from: 0 to: 5 { 
+				float mark <- marks[i];
+				if(transp = max_choice_transp){
+					put mark+gauss(mark/2,mark/4) in: marks at:i;
+			
+				}
+				else {
+					put mark-gauss(mark/2,mark/4) in: marks at:i;
+				}
+			}
+		
+		}
+	
 	}
 	
 	action apply_est_bias {
+		loop transp over: ["car"]{
+			list<float> marks <- self.personal_marks[transp];
+			loop i from: 0 to: 5 { 
+				float mark <- marks[i];
+				put mark+gauss(mark/2,mark/4) in: marks at:i;
+			}
+		}
+		loop transp over: ["bus","walk"]{
+			list<float> marks <- self.personal_marks[transp];
+			loop i from: 0 to: 5 { 
+				float mark <- marks[i];
+				put mark-gauss(mark/2,mark/4) in: marks at:i;
+			}
+		}
 		
 	}
+	
 	
 	action apply_forb_bias {
 		
 	}
 	
+	action apply_preference {
+		loop transp over: ["car","bike","bus","walk"]{
+			list<float> marks <- self.personal_marks[transp];
+			int cpt <- 0;
+			loop crit over: ["ecology", "comfort", "cheap", "safety", "praticity", "fast"] {
+				float mark <- marks[cpt];
+				float crit_pref <- criteria_preference[crit];
+				put mark*crit_pref in: marks at: cpt;
+				cpt <- cpt + 1;
+			}
+		}
+	}
+	
 	reflex choose{
+		write("map recue :");
+		write(self.id);
+		write(self.fitness);
+		write(self.personal_marks);
+		
 		float det <- rnd(1.0);
-		if(det<proportion_conf){
+		if(det < self.proportion_conf){
 			do apply_conf_bias;
 		}
 		det <- rnd(1.0);
-		if(det<proportion_est) {
+		if(det<self.proportion_est) {
 			do apply_est_bias;
 		}
 		det <- rnd(1.0);
-		if(det<proportion_forb){
+		if(det<self.proportion_forb){
 			do apply_forb_bias;
 		}
+		do apply_preference;
 		do ban_with_distance;
 		
 		float max_somme <- -1.0;
 		string transp_max_somme;
 		loop transp over: ["bike", "car", "bus", "walk"] {
 			float somme <- 0.0;
-			list<float> marks <- personal_marks[transp];
+			list<float> marks <- self.personal_marks[transp];
 			loop mark over: marks {
 				somme <- somme + mark;
 			}
@@ -68,7 +135,9 @@ species traveler {
 				transp_max_somme <- transp;
 			}
 		}
-		put  habits[transp_max_somme]+1 in: habits at: transp_max_somme;
+		
+		put  self.habits[transp_max_somme]+1 in: self.habits at: transp_max_somme;
+		
 		choice <- transp_max_somme;
 		
 	}
@@ -76,61 +145,62 @@ species traveler {
 	action ban_with_distance {
 		// Si l'agent est très sportif, il peut prendre le vélo pour des trajets de moins de 20km et la marche à pied pour des trajets de moins de 5km
 		// Lorsqu'il peut marcher ou faire du vélo, les notes de ces moyens de transports sont doublées
-		if(fitness > 95){
-			if(work_dist > 5) {
-				list<float> walk_marks <- personal_marks["walk"];
+		if(self.fitness > 90.0){
+			if(self.work_dist > 5.0) {
+				list<float> walk_marks <- self.personal_marks["walk"];
 				loop i from: 0 to: length(walk_marks) - 1 { 
 					walk_marks[i]<-0;
      			}	
-     			put walk_marks in: personal_marks at: "walk";	
+     			put walk_marks in: self.personal_marks at: "walk";	
 			} else {
-				list<float> walk_marks <- personal_marks["walk"];
+				list<float> walk_marks <- self.personal_marks["walk"];
 				loop i from: 0 to: length(walk_marks) - 1 { 
 					walk_marks[i]<-walk_marks[i]*2;
      			}	
-     			put walk_marks in: personal_marks at: "walk";	
+     			put walk_marks in: self.personal_marks at: "walk";	
 			}
 			if (work_dist>20){
-				list<float> bike_marks <- personal_marks["bike"];
+				list<float> bike_marks <- self.personal_marks["bike"];
 				loop i from: 0 to: length(bike_marks) - 1 { 
 					bike_marks[i]<-0;
      			}
-     			put bike_marks in: personal_marks at: "bike";	
+     			put bike_marks in: self.personal_marks at: "bike";	
 			} else {
-				list<float> bike_marks <- personal_marks["bike"];
+				list<float> bike_marks <- self.personal_marks["bike"];
 				loop i from: 0 to: length(bike_marks) - 1 { 
 					bike_marks[i]<-bike_marks[i]*2;
      			}
-     			put bike_marks in: personal_marks at: "bike";
+     			put bike_marks in: self.personal_marks at: "bike";
 			}
 		} 
 		
 		// Si l'agent est très peu sportif, il ne prend jamais le vélo ou la marche à pieds
-		else if ( fitness < 5) {
-			list<float> walk_marks <- personal_marks["walk"];
-			list<float> bike_marks <- personal_marks["bike"];
+		else if ( self.fitness < 10.0) {
+		
+			list<float> walk_marks <- self.personal_marks["walk"];
+			list<float> bike_marks <- self.personal_marks["bike"];
 			loop i from: 0 to: length(walk_marks) - 1 { 
 				walk_marks[i]<-0;
 				bike_marks[i]<-0;
      		}	
-     		put walk_marks in: personal_marks at: "walk";	
-     		put bike_marks in: personal_marks at: "bike";	
+     		put walk_marks in: self.personal_marks at: "walk";	
+     		put bike_marks in: self.personal_marks at: "bike";	
 		} 
 		
 		// Si l'agent à un niveau de sport dans la norme, il peut prendre le vélo pour des trajets de moins de 8km et la marche pour des trajets de moins de 2 km
 		else {
-			if(work_dist > 2) {
-				list<float> walk_marks <- personal_marks["walk"];
+			if(self.work_dist > 2.0) {
+				list<float> walk_marks <- self.personal_marks["walk"];
 				loop i from: 0 to: length(walk_marks) - 1 { 
 					walk_marks[i]<-0;
      			}	
-     			put walk_marks in: personal_marks at: "walk";	
-			} else if (work_dist>8){
-				list<float> bike_marks <- personal_marks["bike"];
+     			put walk_marks in: self.personal_marks at: "walk";	
+			} else if (self.work_dist > 8.0){
+				list<float> bike_marks <- self.personal_marks["bike"];
 				loop i from: 0 to: length(bike_marks) - 1 { 
 					bike_marks[i]<-0;
      			}
-     			put bike_marks in: personal_marks at: "bike";	
+     			put bike_marks in: self.personal_marks at: "bike";	
 			}
 		}
 	}

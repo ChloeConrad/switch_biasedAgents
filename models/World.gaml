@@ -35,7 +35,7 @@ global {
 	float bikeSpeed;
 	float walkSpeed;
 	float busSpeed;
-
+	
 	float proportion_conf;
 	float proportion_forb;
 	float proportion_est;
@@ -44,25 +44,22 @@ global {
 	
 	// map qui associe chaque moyen de transport une liste de notes correspondant à 
 	// [ecologie, confort, économie,sécurité, praticité, rapidité]
-	map<string, list<float>> marks <- create_map(["bike", "car", "bus", "walk"],
-												[[1.0,0.25,1.0,0.25,0.75,0.75],
-												[0.25,1.0,0.25,0.5,1.0,1.0],
-												[0.5,0.75,0.5,1.0,0.75,0.5],
-												[1.0,0.5,1.0,0.75,0.5,0.25]]);
-												
+	map<string, list<float>> marks;
 	init {
+		marks <- create_map(["bike", "car", "bus", "walk"],
+											[[1.0,0.25,1.0,0.25,0.75,0.75],
+											[0.25,1.0,0.25,0.5,1.0,1.0],
+											[0.5,0.75,0.5,1.0,0.75,0.5],
+											[1.0,0.5,1.0,0.75,0.5,0.25]]);
+												
 		create traveler number: nbrTraveler;
 		create context number: 1;
-		do modif_agents_attributs;
-		
 	}
 	
 	
 	reflex modify_marks_env when: modif=true{
 		
-		////////////////////////////////////////////////////////////
-		// !!!!! FAIRE LES CAS OU ON RETOURNE A LA NORMALE !!!!!!!
-		/////////////////////////////////////////////////////////////
+		write("modif marks env");
 		list<float> bike_marks <- marks["bike"];
 		list<float> walk_marks <- marks["walk"];
 		list<float> car_marks <- marks["car"];
@@ -70,49 +67,76 @@ global {
 		
 		// Modification des notes des moyens de transport en cas de pluie
 		if(rainy = true and rainy != context.population[0].was_rainy) {
-			write("rainy");
+			
 			// Le vélo devient moins confortable et plus dangereux
 			put bike_marks[1]/2 in: bike_marks at: 1;
 			put bike_marks[3]/2 in: bike_marks at: 3;
-			put bike_marks in: marks at: "bike";
 			
 			// La marche devient moins confortable 
 			put walk_marks[1]/2 in: walk_marks at: 1;
-			put walk_marks in: marks at: "walk";
 		
 			// La voiture devient plus dangereuse 
 			put car_marks[3]/2 in: car_marks at: 3 ;
-			put car_marks in: marks at: "car";
 			context.population[0].was_rainy <- true;
+		}
+		
+			// Modification des notes des moyens de transport en cas de pluie
+		if(rainy = false and rainy != context.population[0].was_rainy) {
+			
+			// Le vélo devient moins confortable et plus dangereux
+			put bike_marks[1]*2 in: bike_marks at: 1;
+			put bike_marks[3]*2 in: bike_marks at: 3;
+			
+			// La marche devient moins confortable 
+			put walk_marks[1]*2 in: walk_marks at: 1;
+		
+			// La voiture devient plus dangereuse 
+			put car_marks[3]*2 in: car_marks at: 3 ;
+			context.population[0].was_rainy <- false;
 		}
 		
 		// Modification des notes des moyens de transport en cas de mauvaise température
 		if(temperatureOk=false and context.population[0].was_temperatureOk != temperatureOk) {
 			// Le vélo devient moins confortable 
 			put bike_marks[1]/2 in: bike_marks at: 1;
-			put bike_marks in: marks at: "bike";
 			
 			// La marche devient moins conforatble 
 			put walk_marks[1]/2 in: walk_marks at: 1;
-			put walk_marks in: marks at: "walk";
 			
 			context.population[0].was_temperatureOk <- false;
+		}
+		if(temperatureOk=true and context.population[0].was_temperatureOk != temperatureOk) {
+			// Le vélo devient moins confortable 
+			put bike_marks[1]*2 in: bike_marks at: 1;
+			
+			// La marche devient moins conforatble 
+			put walk_marks[1]*2 in: walk_marks at: 1;
+			
+			context.population[0].was_temperatureOk <- true;
 		}
 		
 		// Modification des notes des moyens de transport quand il fait nuit
 		if(light=false and context.population[0].was_light != light) {
 			// Le vélo devient plus dangereux
 			put bike_marks[3]/2 in: bike_marks at: 3;
-			put bike_marks in: marks at: "bike";
 			
 			// La marche devient plus dangereuse  
 			put walk_marks[3]/2 in: walk_marks at: 3;
-			put walk_marks in: marks at: "walk";
 		
 			// La voiture devient plus dangereuse 
 			put car_marks[3]/2 in: car_marks at: 3 ;
-			put car_marks in: marks at: "car";
 			context.population[0].was_light <- false;
+		}
+		if(light=true and context.population[0].was_light != light) {
+			// Le vélo devient plus dangereux
+			put bike_marks[3]*2 in: bike_marks at: 3;
+			
+			// La marche devient plus dangereuse  
+			put walk_marks[3]*2 in: walk_marks at: 3;
+		
+			// La voiture devient plus dangereuse 
+			put car_marks[3]*2 in: car_marks at: 3 ;
+			context.population[0].was_light <- true;
 		}
 	
 		// Modification des notes des moyens de transport quand nous sommes en ville
@@ -120,20 +144,31 @@ global {
 			// La voiture devient moins rapide et moins pratique  
 			put car_marks[4]/2 in: car_marks at: 4 ;
 			put car_marks[5]/2 in: car_marks at: 5 ;
-			put car_marks in: marks at: "car";
 			context.population[0].was_city <- true;
+		}
+		if (city=false and context.population[0].was_city != city) {
+			// La voiture devient moins rapide et moins pratique  
+			put car_marks[4]*2 in: car_marks at: 4 ;
+			put car_marks[5]*2 in: car_marks at: 5 ;
+			context.population[0].was_city <- false;
 		}
 	
 		// Modification des notes des moyens de transport quand nous sommes en ville
 		if (rush_hour=true and context.population[0].was_rush_hour != rush_hour) {
 			// La voiture devient moins rapide et moins pratique  
 			put car_marks[4]/2 in: car_marks at: 4 ;
-			put car_marks in: marks at: "car";
 			context.population[0].was_rush_hour <- true;
 			
 		}
+		if (rush_hour=false and context.population[0].was_rush_hour != rush_hour) {
+			// La voiture devient moins rapide et moins pratique  
+			put car_marks[4]*2 in: car_marks at: 4 ;
+			context.population[0].was_rush_hour <- false;
+			
+		}
 		
-		// La voiture devaint plus cher quand le prix de l'escence augmente et inversement
+		
+		// La voiture devient plus cher quand le prix de l'escence augmente et inversement
 		put car_marks[2]*(context.population[0].gasPriceRef/gasPrice) in: car_marks at: 2;
 		
 		// Le bus devient plus cher quand le prix de l'abonnement augmente et inversement
@@ -165,17 +200,30 @@ global {
 		context.population[0].walkSpeedRef <- walkSpeed;
 		context.population[0].busSpeedRef <- busSpeed;
 		
-		do modif_agents_attributs;
+		put car_marks in: marks at: "car";
+		put bike_marks in: marks at: "bike";
+		put walk_marks in: marks at: "walk";
+		put bus_marks in: marks at: "bus";
+		
 		modif <- false;
 	}
 	
-	action modif_agents_attributs {
-		list agents <- traveler.population; 
-		loop i from: 0 to: length(agents) - 1 { 
-			agents[i].personal_marks <- marks;
-			agents[i].proportion_conf <- proportion_conf;
-			agents[i].proportion_forb <- proportion_forb;
-			agents[i].proportion_est <- proportion_est;
+	reflex modif_agents_attributs {
+		write("map envoyé : ");
+		write(marks);
+		list<traveler> travelers <- traveler.population; 
+		loop  trav over: travelers{ 
+			loop transp over: ["bike", "car", "bus", "walk"] {
+				list<float> l <- [0.0,0.0,0.0,0.0,0.0,0.0];
+				list<float> marks_trans <- marks[transp];
+				loop i from: 0 to: 5 {
+					l[i] <- marks_trans[i];
+				}
+				put l in: trav.personal_marks at: transp;
+			}
+			trav.proportion_conf <- proportion_conf;
+			trav.proportion_forb <- proportion_forb;
+			trav.proportion_est <- proportion_est;
 			
      	}		
 	}
@@ -217,7 +265,7 @@ experiment switch type: gui {
 	parameter "What is the proportion affected by the forbidden choice bias ?" category:"Bias proportions" var: proportion_forb init: 0.5;
 	parameter "What is the proportion affected by the under/over estimation bias ?" category:"Bias proportions" var: proportion_est init: 0.5;	
 	
-	parameter "Would you like to confirm your modification ?" category: confirmation var: modif <- true among:[false,true];
+	parameter "Would you like to confirm your modification ?" category: confirmation var: modif <- false among:[false,true];
 	output {
 		display "results" {
         chart "results" type: series {
