@@ -102,10 +102,6 @@ species traveler {
 	}
 	
 	reflex choose{
-		write("map recue :");
-		write(self.id);
-		write(self.fitness);
-		write(self.personal_marks);
 		
 		float det <- rnd(1.0);
 		if(det < self.proportion_conf){

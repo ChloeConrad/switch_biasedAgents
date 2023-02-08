@@ -48,7 +48,6 @@ global {
 	init {
 		file marks_file <- json_file("../data/param_switch.json");
 		marks <- marks_file.contents;
-		write(marks);
 												
 		create traveler number: nbrTraveler;
 		create context number: 1;
@@ -57,7 +56,6 @@ global {
 	
 	reflex modify_marks_env when: modif=true{
 		
-		write("modif marks env");
 		list<float> bike_marks <- marks["bike"];
 		list<float> walk_marks <- marks["walk"];
 		list<float> car_marks <- marks["car"];
@@ -207,8 +205,7 @@ global {
 	}
 	
 	reflex modif_agents_attributs {
-		write("map envoyé : ");
-		write(marks);
+		
 		list<traveler> travelers <- traveler.population; 
 		loop  trav over: travelers{ 
 			loop transp over: ["bike", "car", "bus", "walk"] {
@@ -266,7 +263,7 @@ experiment switch type: gui {
 	parameter "Would you like to confirm your modification ?" category: confirmation var: modif <- false among:[false,true];
 	output {
 		display "results" {
-        chart "results" type: series {
+        chart "results" type: histogram {
             data "bike" value: res["bike"] color: #red;
             data "car" value: res["car"] color: #blue;
             data "bus" value: res["bus"] color: #green;
