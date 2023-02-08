@@ -46,11 +46,9 @@ global {
 	// [ecologie, confort, économie,sécurité, praticité, rapidité]
 	map<string, list<float>> marks;
 	init {
-		marks <- create_map(["bike", "car", "bus", "walk"],
-											[[1.0,0.25,1.0,0.25,0.75,0.75],
-											[0.25,1.0,0.25,0.5,1.0,1.0],
-											[0.5,0.75,0.5,1.0,0.75,0.5],
-											[1.0,0.5,1.0,0.75,0.5,0.25]]);
+		file marks_file <- json_file("../data/param_switch.json");
+		marks <- marks_file.contents;
+		write(marks);
 												
 		create traveler number: nbrTraveler;
 		create context number: 1;
@@ -248,7 +246,7 @@ experiment switch type: gui {
 	parameter "Is it rainy ?" category:"Context" var: rainy <- false among:[false, true];
 	parameter "Is the Temperature ok ?" category:"Context" var: temperatureOk <- true among:[true, false];
 	parameter "Is it during the day ?" category:"Context" var: light <- true among:[true, false];
-	parameter "Is it in a big city ?" category:"Context" var: city <- true among:[true, false];
+	parameter "Is it in a big city ?" category:"Context" var: city <- false among:[true, false];
 	parameter "Is it during the rush hour ?" category:"Context" var: rush_hour <- false among:[true, false];
 
 	parameter "How much is the gas per liter price ? (Euros)" category:"Environnement" var: gasPrice init: 1.95;
