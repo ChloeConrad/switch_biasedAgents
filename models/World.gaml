@@ -45,21 +45,19 @@ global {
 	// map qui associe chaque moyen de transport une liste de notes correspondant à 
 	// [ecologie, confort, économie,sécurité, praticité, rapidité]
 	map<string, list<float>> marks;
-	init {
-		file marks_file <- json_file("../data/param_switch.json");
-		marks <- marks_file.contents;
-												
+	init {									
 		create traveler number: nbrTraveler;
 		create context number: 1;
 	}
 	
 	
 	reflex modify_marks_env when: modif=true{
-		
-		list<float> bike_marks <- marks["bike"];
-		list<float> walk_marks <- marks["walk"];
-		list<float> car_marks <- marks["car"];
-		list<float> bus_marks <- marks["bus"];
+		list<traveler> travelers <- traveler.population; 
+		loop  trav over: travelers{ 
+		list<float> bike_marks <- trav.personal_marks["bike"];
+		list<float> walk_marks <- trav.personal_marks["walk"];
+		list<float> car_marks <- trav.personal_marks["car"];
+		list<float> bus_marks <- trav.personal_marks["bus"];
 		
 		// Modification des notes des moyens de transport en cas de pluie
 		if(rainy = true and rainy != context.population[0].was_rainy) {
@@ -196,26 +194,21 @@ global {
 		context.population[0].walkSpeedRef <- walkSpeed;
 		context.population[0].busSpeedRef <- busSpeed;
 		
-		put car_marks in: marks at: "car";
-		put bike_marks in: marks at: "bike";
-		put walk_marks in: marks at: "walk";
-		put bus_marks in: marks at: "bus";
+		put car_marks in: trav.personal_marks at: "car";
+		put bike_marks in: trav.personal_marks at: "bike";
+		put walk_marks in: trav.personal_marks at: "walk";
+		put bus_marks in: trav.personal_marks at: "bus";
 		
 		modif <- false;
+		
+		}
 	}
 	
 	reflex modif_agents_attributs {
 		
 		list<traveler> travelers <- traveler.population; 
 		loop  trav over: travelers{ 
-			loop transp over: ["bike", "car", "bus", "walk"] {
-				list<float> l <- [0.0,0.0,0.0,0.0,0.0,0.0];
-				list<float> marks_trans <- marks[transp];
-				loop i from: 0 to: 5 {
-					l[i] <- marks_trans[i];
-				}
-				put l in: trav.personal_marks at: transp;
-			}
+			
 			trav.proportion_conf <- proportion_conf;
 			trav.proportion_forb <- proportion_forb;
 			trav.proportion_est <- proportion_est;

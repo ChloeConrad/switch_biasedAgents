@@ -28,15 +28,36 @@ species traveler {
 		id <- rnd(200);
 		fitness <- rnd(100.0);
 		work_dist <- rnd(20.0);
-		personal_marks <- create_map(["bike", "car", "bus", "walk"],
-									[[1.0,0.25,1.0,0.25,0.75,0.75],
-									[0.25,1.0,0.25,0.5,1.0,1.0],
-									[0.5,0.75,0.5,1.0,0.75,0.5],
-									[1.0,0.5,1.0,0.75,0.5,0.25]]);
+	
 									
 		habits <- create_map(["bike","car","bus","walk"],[rnd(10),rnd(10),rnd(10),rnd(10)]);
+		
+		int max <- -1;
+		string max_choice_transp;
+		loop transp over: ["bike", "car", "bus", "walk"] {
+			if(self.habits[transp]>max){
+				max <- self.habits[transp];
+				max_choice_transp <- transp;
+			}
+		}
+		// a décocher quand réponses au questionnaire 
+		// file marks_file <- json_file("../data/param_switch_"+max_choice_transp+".json");	
+		// Pour remplacer ça :
+		////////////////////////////////////////////////////////////////////////////////////////////////
+		file marks_file;
+		if(max_choice_transp = "bus"){
+			marks_file <- json_file("../data/param_switch_bus.json");	
+		}
+		else {
+			marks_file <- json_file("../data/param_switch.json");
+		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////
+		personal_marks <- marks_file.contents;
+		write(personal_marks);
 		criteria_preference <- create_map(["ecology", "comfort", "cheap", "safety", "praticity", "fast"],[rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0)]);
 	}
+	
+	
 	
 	action apply_conf_bias {
 		int max <- -1;
@@ -51,7 +72,9 @@ species traveler {
 		loop transp over: ["bike", "car", "bus", "walk"] {
 			list<float> marks <- self.personal_marks[transp];
 			loop i from: 0 to: 5 { 
+				write(marks);
 				float mark <- marks[i];
+				
 				if(transp = max_choice_transp){
 					put mark+gauss(mark/2,mark/4) in: marks at:i;
 			
@@ -203,5 +226,4 @@ species traveler {
 }
 
 
-/* Insert your model definition here */
 
