@@ -28,7 +28,7 @@ def mean(list_elem) :
             moy.append((somme/nb_participant)/6)
         return moy
 
-# Crée un Json contenant les notes qu'on attribuer l'ensemble des participants aux différents moyens de transports
+# Crée un Json contenant les notes qu'ont attribués l'ensemble des participants aux différents moyens de transports
 def extract_general_marks(values) : 
     values = delete_comments(values)
     values = values[:,:-1].astype(int)
