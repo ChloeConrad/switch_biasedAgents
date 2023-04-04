@@ -41,16 +41,16 @@ species traveler {
 			}
 		}
 		// a décocher quand réponses au questionnaire 
-		// file marks_file <- json_file("../data/param_switch_"+max_choice_transp+".json");	
+		file marks_file <- json_file("../data/marks_"+max_choice_transp+"_users.json");	
 		// Pour remplacer ça :
 		////////////////////////////////////////////////////////////////////////////////////////////////
-		file marks_file;
-		if(max_choice_transp = "bus"){
-			marks_file <- json_file("../data/param_switch_bus.json");	
-		}
-		else {
-			marks_file <- json_file("../data/param_switch.json");
-		}
+		//file marks_file;
+		//if(max_choice_transp = "bus"){
+		//	marks_file <- json_file("../data/param_switch_bus.json");	
+		//}
+		//else {
+		//	marks_file <- json_file("../data/param_switch.json");
+		//}
 		/////////////////////////////////////////////////////////////////////////////////////////////////
 		personal_marks <- marks_file.contents;
 		write(personal_marks);
