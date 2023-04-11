@@ -40,18 +40,8 @@ species traveler {
 				max_choice_transp <- transp;
 			}
 		}
-		// a décocher quand réponses au questionnaire 
+		
 		file marks_file <- json_file("../data/marks_"+max_choice_transp+"_users.json");	
-		// Pour remplacer ça :
-		////////////////////////////////////////////////////////////////////////////////////////////////
-		//file marks_file;
-		//if(max_choice_transp = "bus"){
-		//	marks_file <- json_file("../data/param_switch_bus.json");	
-		//}
-		//else {
-		//	marks_file <- json_file("../data/param_switch.json");
-		//}
-		/////////////////////////////////////////////////////////////////////////////////////////////////
 		personal_marks <- marks_file.contents;
 		write(personal_marks);
 		criteria_preference <- create_map(["ecology", "comfort", "cheap", "safety", "praticity", "fast"],[rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0)]);
@@ -107,9 +97,7 @@ species traveler {
 	}
 	
 	
-	action apply_forb_bias {
-		
-	}
+
 	
 	action apply_preference {
 		loop transp over: ["car","bike","bus","walk"]{
@@ -134,10 +122,7 @@ species traveler {
 		if(det<self.proportion_est) {
 			do apply_est_bias;
 		}
-		det <- rnd(1.0);
-		if(det<self.proportion_forb){
-			do apply_forb_bias;
-		}
+		
 		do apply_preference;
 		do ban_with_distance;
 		
