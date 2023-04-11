@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 
-
+# Permet de retiirer de data les réponses des particiapants 
+# qui n'ont pas répondu au questionnaire.
 def remove_no_responses(data):
     responses = np.array(data.iloc[:, :].values)
     new_responses = responses.copy()
@@ -15,24 +16,27 @@ def remove_no_responses(data):
     return new_responses[0:cpt, 10:]
 
 
-def nbr_transport_users(rep, transp):
+# Retourne le nombre de personne qui utilisent le moyen de transport tranp.
+def nbr_transport_users(reponses, transport_type):
     cpt = 0
-    for participant in rep:
-        if (participant[1] == transp):
+    for participant in reponses:
+        if (participant[1] == transport_type):
             cpt += 1
     return cpt
 
-
-def extract_modes_users_responses(rep, transport_mode):
-    transport_mode_response = rep.copy()
+# Retourne un array à deux dimensions contenant 
+# les réponses des participants utilisant le moyen de transport_mode.
+def extract_modes_users_responses(responses, transport_mode):
+    transport_mode_response = responses.copy()
     cpt = 0
-    for participant_response in rep:
+    for participant_response in responses:
         if (participant_response[1] == transport_mode):
             transport_mode_response[cpt] = participant_response
             cpt += 1
     return transport_mode_response[0:cpt, :]
 
-
+# Retourne un array à deux dimensions contenant les réponses 
+# des participants n'utilisant pas le moyen de transport_mode.
 def extract_modes_nonusers_responses(responses, transport):
     transport_mode_response = responses.copy()
     cpt = 0
@@ -42,7 +46,7 @@ def extract_modes_nonusers_responses(responses, transport):
             cpt += 1
     return transport_mode_response[0:cpt, :]
 
-
+# Permet de garder dans responses seulement les notes attribuer aux moyens de tranports.
 def extract_marks(responses):
     marks = np.zeros((responses.shape[0], 24))
     cpt = 0
@@ -56,12 +60,13 @@ def extract_marks(responses):
         cpt += 1
     return marks
 
-
-def nonusers_marks(transp_nonusers_responses, transport):
+# Permet de garder dans responses seulement les notes attribuer aux moyen de transport transport_type.
+# Sert à calculer la note attribuer au moyen de transport par les participants qui ne l'utilisent pas.
+def nonusers_marks(transp_nonusers_responses, transport_type):
     marks = np.zeros((transp_nonusers_responses.shape[0], 6))
     cpt = 0
     for participant_responses in transp_nonusers_responses:
-        if (transport == "bike"):
+        if (transport_type == "bike"):
             marks_part = participant_responses[16:22]
             marks_part_without_nan = []
             for mark in marks_part:
@@ -69,7 +74,7 @@ def nonusers_marks(transp_nonusers_responses, transport):
                     marks_part_without_nan.append(mark)
             marks[cpt] = marks_part_without_nan
             cpt += 1
-        elif (transport == "car"):
+        elif (transport_type == "car"):
             marks_part = participant_responses[23:29]
             marks_part_without_nan = []
             for mark in marks_part:
@@ -77,7 +82,7 @@ def nonusers_marks(transp_nonusers_responses, transport):
                     marks_part_without_nan.append(mark)
             marks[cpt] = marks_part_without_nan
             cpt += 1
-        elif (transport == "bus"):
+        elif (transport_type == "bus"):
             marks_part = participant_responses[30:36]
             marks_part_without_nan = []
             for mark in marks_part:
@@ -85,7 +90,7 @@ def nonusers_marks(transp_nonusers_responses, transport):
                     marks_part_without_nan.append(mark)
             marks[cpt] = marks_part_without_nan
             cpt += 1
-        elif (transport == "walk"):
+        elif (transport_type == "walk"):
             marks_part = participant_responses[37:43]
             marks_part_without_nan = []
             for mark in marks_part:
@@ -97,8 +102,6 @@ def nonusers_marks(transp_nonusers_responses, transport):
 
 # Retourne un tableau à deux dimensions dans lequel chaque ligne représente les réponse d'un participant
 # Pour chaque participant, la liste contient l'ensemble de ses réponses sur l'importance des critères dans son choix
-
-
 def extract_preference(responses):
     preferences = np.empty((responses.shape[0], 6))
     cpt = 0
@@ -114,7 +117,9 @@ def extract_preference(responses):
         cpt += 1
     return preferences
 
-
+# Retorune une liste à 6 éléments contenant la moyenne des notes attribuer à chaque critère pour un moyen de transport donné
+# La liste sera alors sous cette forme : 
+# [Moyenne écologie, Moyenne confort, Moyenne accessibilité financière, Moyenne praticité, Moyenne rapidité, Moyenne sécurité]
 def mean_list_values(list):
     res = [0, 0, 0, 0, 0, 0]
     if (len(list) == 0):
@@ -130,7 +135,9 @@ def mean_list_values(list):
 
     return res
 
-
+# Permet de calculer un disctionnaire qui associe à chaque moyen de transport 
+# la liste des notes des différents critères.
+# Permet également d'enregistrer ce dictionnaire au format json
 def compute_moy_marks(responses, transp_mode):
     bike_reponses = []
     car_reponses = []
@@ -153,7 +160,8 @@ def compute_moy_marks(responses, transp_mode):
 
     return dico_results
 
-
+# Permet de calculer une liste contenant la moyennes des valeurs d'importances 
+# attribuées à chaque critères de choix et de l'enregistrer au format json.
 def compute_moy_preference(responses, transp_mode):
     ecology_reponses = 0
     confort_reponses = 0
@@ -182,7 +190,8 @@ def compute_moy_preference(responses, transp_mode):
 
     return preferences
 
-
+# Affichage sous forme de diagramme des notes attribuées aux crittères aux moyens de transport 
+# par les utilisateurs quotidiens du moyen de transport transp_users
 def plot_results_marks(results, transp_users):
     for transport_type in results.keys():
         keys = ["Ecology", "Confort", "Cheapness",
@@ -199,7 +208,8 @@ def plot_results_marks(results, transp_users):
         plt.ylim(0, 1)
         plt.show()
 
-
+# Affichage sous forme de diagramme des valeurs d'importance attribuées aux crittères 
+# par les utilisateurs quotidiens du moyen de transport transp_users
 def plot_results_preferences(results, transp_users):
     keys = ["Ecology", "Confort", "Cheapness",
             "Practicity", "Fastness", "Safety"]
@@ -215,7 +225,8 @@ def plot_results_preferences(results, transp_users):
     plt.ylim(0, 1)
     plt.show()
 
-
+# Permet de détecter une anomalie dans la réponse à la question de la non disponibilité de chaque moyen de transport.
+# Retourne False si la réponse n'est pas normale (tous les moyens de transports sont cochés ou le moyen de transport utilisé au quotidien est coché)
 def question_impossible_transp_is_normal(results):
     if (results[4] == "X" and results[5] == "X" and results[6] == "X" and results[7] == "X"):
         return False
@@ -227,7 +238,9 @@ def question_impossible_transp_is_normal(results):
             return False
     return True
 
-
+# Retourne la liste des moyens de transport que l'utilisateur ne peut pas utiliser.
+# La liste est définie enfonction des déclarations du participants 
+# et de la distances séparant son lieu d'habitation et son lieu d'activité.
 def extract_impossible_transp(results):
     b = question_impossible_transp_is_normal(results)
     impossible_transp = []
@@ -248,9 +261,9 @@ def extract_impossible_transp(results):
     return impossible_transp
 
 
-
-
-
+# Retourne le choix que devrait faire l'utilisateur. (méthode 1)
+#  Ici, on prend en compte les valeurs d'importance qu'il a donnée aux diffénrets critères de choix
+#  et les notes attribuée à ces critères pour chaque moyen de transport.
 def compare_res_user(results, marks, preferences):
     idx_transp = 0
     impossible_transp = extract_impossible_transp(results)
@@ -268,7 +281,9 @@ def compare_res_user(results, marks, preferences):
         if (choice not in impossible_transp):
             return choice
 
-
+#  Retourne le choix que devrait faire l'utilisateur. (méthode 2)
+#  Ici, on prend en compte les valeurs d'importance qu'il a donnée aux diffénrets critères de choix
+#  et les  moyennes des notes attribuées à ces critères pour chaque moyen de transport par l'ensemble des participants.
 def compare_res_user_genral(results, marks, preferences):
     idx_transp = 0
     impossible_transp = extract_impossible_transp(results)
@@ -281,12 +296,12 @@ def compare_res_user_genral(results, marks, preferences):
         transp_grades[transp] = grade
 
     ordered_choices = dict(sorted(transp_grades.items(),key=lambda x: x[1], reverse=True))
-    # return ordered_choices[0]
     for choice in ordered_choices:
         if (choice not in impossible_transp):
             return choice
 
-
+# Affiche sous forme d'un diagramme pour chaque moyen de transport combien 
+# d'utilisateurs de transport_type auraient du le choisir selon la méthode 1.
 def plot_compare(results, marks, preferences, transport_type):
     transp_grades = {'car': 0, 'bike': 0, 'bus': 0, 'walk': 0}
     for i in range(results.shape[0]):
@@ -303,7 +318,8 @@ def plot_compare(results, marks, preferences, transport_type):
     plt.bar_label(container=cont, labels=values)
     plt.show()
 
-
+# Affiche sous forme d'un diagramme pour chaque moyen de transport combien 
+# d'utilisateurs de transport_type auraient du le choisir selon la méthode 1
 def plot_compare_to_general(results, marks, preferences, transport_type):
     transp_grades = {'car': 0, 'bike': 0, 'bus': 0, 'walk': 0}
     for i in range(results.shape[0]):
@@ -320,7 +336,8 @@ def plot_compare_to_general(results, marks, preferences, transport_type):
     plt.bar_label(container=cont, labels=values)
     plt.show()
 
-
+# Affiche la moyenne des notes attribuées à un moyen de transport 
+# par les participants qui ne le choisissent pas comme transport quotidien
 def plot_moy_non_users_marks(non_users_marks_on_transp, transp):
     moy_marks = [0, 0, 0, 0, 0, 0]
 
@@ -357,7 +374,9 @@ def plot_moy_non_users_marks(non_users_marks_on_transp, transp):
 # Il s'agit de données fictives, les véritables données du questionnaire ne peuvent pas être publié sur 
 # dépot public pour des raisons de confidentialité. 
 # La ligne est à commenter pour utilisation du script avec les vraies données du questionnaire
-data = pd.read_csv('data/modes_de_transports_et_perceptions.csv', sep='\t', header=None)
+data = pd.read_csv('data/demo.csv', sep='\t', header=None)
+
+
 test = np.array(data.iloc[:, :].values)
 responses = remove_no_responses(data)
 
@@ -381,7 +400,7 @@ for transp in transport_types:
 
     marks_results = compute_moy_marks(transport_users_marks, transp)
     preferences_results = compute_moy_preference(
-    transport_users_preference, transp)
+        transport_users_preference, transp)
 
     transp_nonusers_responses = extract_modes_nonusers_responses(
     responses, transp)
