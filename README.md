@@ -9,6 +9,9 @@ Mini switch est un système multi agents dans lequel les agents doivent choisir 
 Structure du projet
 -----------
 
-Tuto lancement de la simulation
+Simulation
 -----------
+
+Traitement des données du questionnaire
+----------
 
