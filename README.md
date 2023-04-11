@@ -16,6 +16,6 @@ Traitement des données du questionnaire
 ----------
 Le traitement des données obtnus via le questionnaire ce fait grâce au fichier extraction.py présent à la racine du projet. Dans la version présente sur ce dépot, le script utilise les données présentent dans le fichier demo.csv du dossier data. Ce fichier contient des données fictives. Les véritables réponses des participants ne peuvent pas être mis à disposition sur ce dépot pour des raison de respects des lois lié à l'utilisation de données personelles.
 
-Les résultats obtenus du traitement des réponses des participants sont présenté sous forme de diagramme dans le sous-dossier results du dossier data.
+Les résultats obtenus du traitement des réponses des participants sont présenté sous forme de diagrammes dans le sous-dossier results du dossier data.
 
 
