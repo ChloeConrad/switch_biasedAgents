@@ -367,13 +367,13 @@ def plot_moy_non_users_marks(non_users_marks_on_transp, transp):
 ########### MAIN #######################################################################################
 ########################################################################################################
 
-# Ligne ci-dessus à décommenter pour utilisation du script avec les vraies données du questionnaire
+"""Ligne ci-dessus à décommenter pour utilisation du script avec les vraies données du questionnaire"""
 # data = pd.read_csv('data/modes_de_transports_et_perceptions.csv', sep=',', header=None)
 
-# Données de démonstration pour le rendu du projet dans le cadre de l'UE ouverture à la recherche 
-# Il s'agit de données fictives, les véritables données du questionnaire ne peuvent pas être publié sur 
-# dépot public pour des raisons de confidentialité. 
-# La ligne est à commenter pour utilisation du script avec les vraies données du questionnaire
+"""Données de démonstration pour le rendu du projet dans le cadre de l'UE ouverture à la recherche 
+Il s'agit de données fictives, les véritables données du questionnaire ne peuvent pas être publié sur 
+dépot public pour des raisons de confidentialité. 
+La ligne est à commenter pour utilisation du script avec les vraies données du questionnaire"""
 data = pd.read_csv('data/demo.csv', sep='\t', header=None)
 
 
