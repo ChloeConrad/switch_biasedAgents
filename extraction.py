@@ -154,9 +154,9 @@ def compute_moy_marks(responses, transp_mode):
     dico_results = {"bike": mean_list_values(bike_reponses), "car": mean_list_values(car_reponses),
                     "bus": mean_list_values(bus_reponses), "walk": mean_list_values(walk_reponses)}
     # Lignes ci-dessus à décommenter pour utilisation du script avec les vraies données du questionnaire
-    #if transp_mode != "":
-        # with open("data/marks_"+transp_mode+"_users.json", 'w') as file:
-            # json.dump(dico_results, file)
+    if transp_mode != "":
+        with open("data/marks_"+transp_mode+"_users.json", 'w') as file:
+            json.dump(dico_results, file)
 
     return dico_results
 
@@ -185,8 +185,8 @@ def compute_moy_preference(responses, transp_mode):
                    (practicity_reponses/cpt_participants)/10, (fast_responses/cpt_participants)/10, (safety_reponses/cpt_participants)/10]
 
     # Ligne ci-dessus à décommenter pour utilisation du script avec les vraies données du questionnaire
-    #with open("data/preferences_"+transp_mode+"_users.json.json", 'w') as file:
-    #    json.dump({"preferences": preferences}, file)
+    with open("data/preferences_"+transp_mode+"_users.json.json", 'w') as file:
+       json.dump({"preferences": preferences}, file)
 
     return preferences
 
@@ -367,13 +367,13 @@ def plot_moy_non_users_marks(non_users_marks_on_transp, transp, nbr):
 ########################################################################################################
 
 """Ligne ci-dessus à décommenter pour utilisation du script avec les vraies données du questionnaire"""
-# data = pd.read_csv('data/modes_de_transports_et_perceptions.csv', sep=',', header=None)
+data = pd.read_csv('data/modes_de_transports_et_perceptions.csv', sep=',', header=None)
 
 """Données de démonstration pour le rendu du projet dans le cadre de l'UE ouverture à la recherche 
 Il s'agit de données fictives, les véritables données du questionnaire ne peuvent pas être publié sur 
 dépot public pour des raisons de confidentialité. 
 La ligne est à commenter pour utilisation du script avec les vraies données du questionnaire"""
-data = pd.read_csv('data/demo.csv', sep='\t', header=None)
+# data = pd.read_csv('data/demo.csv', sep='\t', header=None)
 
 
 test = np.array(data.iloc[:, :].values)
