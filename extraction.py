@@ -192,7 +192,7 @@ def compute_moy_preference(responses, transp_mode):
 
 # Affichage sous forme de diagramme des notes attribuées aux crittères aux moyens de transport 
 # par les utilisateurs quotidiens du moyen de transport transp_users
-def plot_results_marks(results, transp_users):
+def plot_results_marks(results, transp_users, nbr):
     for transport_type in results.keys():
         keys = ["Ecology", "Confort", "Cheapness",
                 "Practicity", "Fastness", "Safety"]
@@ -202,7 +202,7 @@ def plot_results_marks(results, transp_users):
         for i in range(6):
             values[i] = round(values[i], 3)
         plt.bar_label(container=cont, labels=values)
-        plt.title(transp_users + " users perceptions on "+transport_type)
+        plt.title(transp_users + " users perceptions on "+transport_type+ " (N = "+str(nbr)+")")
         plt.xlabel("Criterion")
         plt.ylabel("marks mean")
         plt.ylim(0, 1)
@@ -210,7 +210,7 @@ def plot_results_marks(results, transp_users):
 
 # Affichage sous forme de diagramme des valeurs d'importance attribuées aux crittères 
 # par les utilisateurs quotidiens du moyen de transport transp_users
-def plot_results_preferences(results, transp_users):
+def plot_results_preferences(results, transp_users, nbr):
     keys = ["Ecology", "Confort", "Cheapness",
             "Practicity", "Fastness", "Safety"]
     values = results
@@ -219,7 +219,7 @@ def plot_results_preferences(results, transp_users):
     for i in range(6):
         values[i] = round(values[i], 3)
     plt.bar_label(container=cont, labels=values)
-    plt.title(transp_users + " criterion preferences")
+    plt.title(transp_users + " criterion preferences" + " (N = "+str(nbr)+")")
     plt.xlabel("Criterion")
     plt.ylabel("importance values for the transport mode choice mean")
     plt.ylim(0, 1)
@@ -276,7 +276,6 @@ def compare_res_user(results, marks, preferences):
         transp_grades[transp] = grade
 
     ordered_choices = dict(sorted(transp_grades.items(),key=lambda x: x[1], reverse=True))
-    # return ordered_choices[0]
     for choice in ordered_choices:
         if (choice not in impossible_transp):
             return choice
@@ -302,7 +301,7 @@ def compare_res_user_genral(results, marks, preferences):
 
 # Affiche sous forme d'un diagramme pour chaque moyen de transport combien 
 # d'utilisateurs de transport_type auraient du le choisir selon la méthode 1.
-def plot_compare(results, marks, preferences, transport_type):
+def plot_compare(results, marks, preferences, transport_type, nbr):
     transp_grades = {'car': 0, 'bike': 0, 'bus': 0, 'walk': 0}
     for i in range(results.shape[0]):
         choice_is_rationnal = compare_res_user(
@@ -312,7 +311,7 @@ def plot_compare(results, marks, preferences, transport_type):
     values = transp_grades.values()
     color_list = ['r', 'c', 'y', 'm']
     cont = plt.bar(keys, values, color=color_list)
-    plt.title("Rationnal choices for "+transport_type+" users")
+    plt.title("Rationnal choices for "+transport_type+" users" + " (N = "+str(nbr)+")")
     plt.xlabel("transport modes")
     plt.ylabel("Number of people that should choose the transport mode")
     plt.bar_label(container=cont, labels=values)
@@ -320,7 +319,7 @@ def plot_compare(results, marks, preferences, transport_type):
 
 # Affiche sous forme d'un diagramme pour chaque moyen de transport combien 
 # d'utilisateurs de transport_type auraient du le choisir selon la méthode 1
-def plot_compare_to_general(results, marks, preferences, transport_type):
+def plot_compare_to_general(results, marks, preferences, transport_type, nbr):
     transp_grades = {'car': 0, 'bike': 0, 'bus': 0, 'walk': 0}
     for i in range(results.shape[0]):
         choice_is_rationnal = compare_res_user_genral(
@@ -330,7 +329,7 @@ def plot_compare_to_general(results, marks, preferences, transport_type):
     values = transp_grades.values()
     color_list = ['r', 'c', 'y', 'm']
     cont = plt.bar(keys, values, color=color_list)
-    plt.title("Rationnal choices for "+transport_type+" users (method 2)")
+    plt.title("Rationnal choices for "+transport_type+" users (method 2)" + " (N = "+str(nbr)+")")
     plt.xlabel("transport modes")
     plt.ylabel("Number of people that should choose the transport mode")
     plt.bar_label(container=cont, labels=values)
@@ -338,7 +337,7 @@ def plot_compare_to_general(results, marks, preferences, transport_type):
 
 # Affiche la moyenne des notes attribuées à un moyen de transport 
 # par les participants qui ne le choisissent pas comme transport quotidien
-def plot_moy_non_users_marks(non_users_marks_on_transp, transp):
+def plot_moy_non_users_marks(non_users_marks_on_transp, transp, nbr):
     moy_marks = [0, 0, 0, 0, 0, 0]
 
     for participant_marks in non_users_marks_on_transp:
@@ -356,7 +355,7 @@ def plot_moy_non_users_marks(non_users_marks_on_transp, transp):
     for i in range(6):
         values[i] = round(values[i], 3)
     plt.bar_label(container=cont, labels=values)
-    plt.title("non users perceptions on "+transp)
+    plt.title("non users perceptions on " + transp + " (N = "+str(nbr)+")")
     plt.xlabel("Criterion")
     plt.ylabel("marks mean")
     plt.ylim(0, 1)
@@ -387,27 +386,28 @@ transport_types = ["bike", "car", "bus", "walk"]
 
 general_marks = extract_marks(responses)
 general_marks_means = compute_moy_marks(general_marks, "")
-plot_results_marks(general_marks_means, "all")
+plot_results_marks(general_marks_means, "all", general_marks.shape[0])
 
 for transp in transport_types:
     transp_users_responses = extract_modes_users_responses(responses, dico[transp])
+    nbr_users = transp_users_responses.shape[0]
     transport_users_marks = extract_marks(transp_users_responses)
     transport_users_preference = extract_preference(transp_users_responses)
     plot_compare(transp_users_responses, transport_users_marks,
-             transport_users_preference, transp)
+             transport_users_preference, transp, nbr_users)
     plot_compare_to_general(
-    transp_users_responses, general_marks_means, transport_users_preference, transp)
+    transp_users_responses, general_marks_means, transport_users_preference, transp, nbr_users)
 
     marks_results = compute_moy_marks(transport_users_marks, transp)
     preferences_results = compute_moy_preference(
         transport_users_preference, transp)
 
-    transp_nonusers_responses = extract_modes_nonusers_responses(
-    responses, transp)
+    transp_nonusers_responses = extract_modes_nonusers_responses(responses, dico[transp])
+    nbr_non_users = transp_nonusers_responses.shape[0]
     non_users_marks_on_transp = nonusers_marks(
     transp_nonusers_responses, transp)
-    plot_moy_non_users_marks(non_users_marks_on_transp, transp)
+    plot_moy_non_users_marks(non_users_marks_on_transp, transp, nbr_non_users)
 
 # Affichage des résultats obtenus sous forme de diagramme
-    plot_results_marks(marks_results, transp)
-    plot_results_preferences(preferences_results, transp)
+    plot_results_marks(marks_results, transp, nbr_users)
+    plot_results_preferences(preferences_results, transp, nbr_users)
