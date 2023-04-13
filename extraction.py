@@ -249,16 +249,30 @@ def extract_impossible_transp(results):
             impossible_transp.append('bike')
         if (float(results[2]) > 5):
             impossible_transp.append('walk')
+        return impossible_transp
     if (b):
+        if (results[4] == 'X' or float(results[2]) > 15):
+            impossible_transp.append('bike')
+        if (results[5] == 'X'):
+            impossible_transp.append('car')
+        if (results[6] == 'X' or float(results[2]) < 1):
+            impossible_transp.append('bus')
+        if (float(results[2]) > 5 or results[7] == 'X'):
+            impossible_transp.append('walk')
+    
+    if len(impossible_transp) < 4 :
+        return impossible_transp
+    else :
+        impossible_transp = []
         if (results[4] == 'X'):
             impossible_transp.append('bike')
         if (results[5] == 'X'):
             impossible_transp.append('car')
-        if (results[6] == 'X' and float(results[2]) < 1):
+        if (results[6] == 'X'):
             impossible_transp.append('bus')
-        if (float(results[2]) > 5 or results[7] == 'X'):
+        if (results[7] == 'X'):
             impossible_transp.append('walk')
-    return impossible_transp
+        return impossible_transp
 
 
 # Retourne le choix que devrait faire l'utilisateur. (méthode 1)
