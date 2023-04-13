@@ -219,7 +219,7 @@ def plot_results_preferences(results, transp_users, nbr):
     for i in range(6):
         values[i] = round(values[i], 3)
     plt.bar_label(container=cont, labels=values)
-    plt.title(transp_users + " criterion preferences" + " (N = "+str(nbr)+")")
+    plt.title(transp_users + " users criterion preferences" + " (N = "+str(nbr)+")")
     plt.xlabel("Criterion")
     plt.ylabel("importance values for the transport mode choice mean")
     plt.ylim(0, 1)
@@ -311,7 +311,7 @@ def plot_compare(results, marks, preferences, transport_type, nbr):
     values = transp_grades.values()
     color_list = ['r', 'c', 'y', 'm']
     cont = plt.bar(keys, values, color=color_list)
-    plt.title("Rationnal choices for "+transport_type+" users" + " (N = "+str(nbr)+")")
+    plt.title("Rationnal choices for "+transport_type+" users (method 1)" + " (N = "+str(nbr)+")")
     plt.xlabel("transport modes")
     plt.ylabel("Number of people that should choose the transport mode")
     plt.bar_label(container=cont, labels=values)
