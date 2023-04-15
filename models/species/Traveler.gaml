@@ -43,8 +43,15 @@ species traveler {
 		
 		file marks_file <- json_file("../data/marks_"+max_choice_transp+"_users.json");	
 		personal_marks <- marks_file.contents;
-		write(personal_marks);
+		file preference <- json_file("../data/preferences_"+max_choice_transp+"_users.json");
+		map<string, list<float>> map_pref <- preference.contents;	
 		criteria_preference <- create_map(["ecology", "comfort", "cheap", "safety", "praticity", "fast"],[rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0),rnd(1.0)]);
+		int i <- 0;
+		list<float> values <- map_pref["preferences"];
+		loop crit over: ["ecology", "comfort", "cheap", "safety", "praticity", "fast"] {
+			put values[i] in: criteria_preference at: crit;
+			i <- i+1;
+		}
 	}
 	
 	
@@ -79,21 +86,13 @@ species traveler {
 	}
 	
 	action apply_est_bias {
-		loop transp over: ["car"]{
+		loop transp over: ["walk","bike"]{
 			list<float> marks <- self.personal_marks[transp];
 			loop i from: 0 to: 5 { 
 				float mark <- marks[i];
-				put mark+gauss(mark/2,mark/4) in: marks at:i;
+				put mark*0.8 in: marks at:i;
 			}
 		}
-		loop transp over: ["bus","walk"]{
-			list<float> marks <- self.personal_marks[transp];
-			loop i from: 0 to: 5 { 
-				float mark <- marks[i];
-				put mark-gauss(mark/2,mark/4) in: marks at:i;
-			}
-		}
-		
 	}
 	
 	

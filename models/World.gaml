@@ -231,7 +231,7 @@ global {
 experiment switch type: gui {
 	
 	// Context initialization 
-	parameter "Agents number" category:"Agents" var: nbrTraveler init: 100;
+	parameter "Agents number" category:"Agents" var: nbrTraveler init: 625;
 	
 	parameter "Is it rainy ?" category:"Context" var: rainy <- false among:[false, true];
 	parameter "Is the Temperature ok ?" category:"Context" var: temperatureOk <- true among:[true, false];
@@ -250,7 +250,6 @@ experiment switch type: gui {
 	parameter "What is the walking average speed ? (km/h)" category:"Environnement" var: walkSpeed init: 6.4;
 	
 	parameter "What is the proportion affected by the confirmation bias ?" category:"Bias proportions" var: proportion_conf init: 0.5;
-	parameter "What is the proportion affected by the forbidden choice bias ?" category:"Bias proportions" var: proportion_forb init: 0.5;
 	parameter "What is the proportion affected by the under/over estimation bias ?" category:"Bias proportions" var: proportion_est init: 0.5;	
 	
 	parameter "Would you like to confirm your modification ?" category: confirmation var: modif <- false among:[false,true];
