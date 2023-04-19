@@ -26,7 +26,8 @@ Le dossier data contient les fichiers JSON dans lesquels sont stockées les vale
 
 ## Traitement des données du questionnaire
 Le traitement des données obtenues via le questionnaire se fait grâce au fichier extraction.py présent à la racine du projet. Dans la version présente sur ce dépôt, le script utilise les données présentes dans le fichier demo.csv du dossier data. Ce fichier contient des données fictives. Les véritables réponses des participants ne peuvent pas être mises à disposition sur ce dépôt pour des raisons de respect des lois portant sur l'utilisation de données personnelles.
-# Calibrage de la simulation Mini Switch
+
+### Calibrage de la simulation Mini Switch
 Le but principal du traitement des données était d'extraire les moyennes des notes attribuées à chaque critère pour chaque moyen de transport à partir des réponses au questionnaire. Pour cela, nous avons pris en compte plusieurs populations :
 * L’entièreté de la population des répondants au questionnaire.
 * Les répondants ayant pour moyen de transport quotidien la voiture.
