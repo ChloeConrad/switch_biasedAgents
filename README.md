@@ -21,10 +21,10 @@ Ensuite, le lancement de la simulation se fait via le bouton "run" présent en h
 * Context.gaml : Définition des valeurs par défaut des paramètres de l'environnement.
 * Traveler.gaml : Description globale des agents, de leurs paramètres (préférences, notes) et de leurs comportements (choix d'un moyen de transport, biais).
 
-###Dossier data
+### Dossier data
 Le dossier data contient les fichiers JSON dans lesquels sont stockées les valeurs des paramètres (préférences et notes) utilisées par les agents dans la simulation.
 
-##Traitement des données du questionnaire
+## Traitement des données du questionnaire
 Le traitement des données obtenues via le questionnaire se fait grâce au fichier extraction.py présent à la racine du projet. Dans la version présente sur ce dépôt, le script utilise les données présentes dans le fichier demo.csv du dossier data. Ce fichier contient des données fictives. Les véritables réponses des participants ne peuvent pas être mises à disposition sur ce dépôt pour des raisons de respect des lois portant sur l'utilisation de données personnelles.
 # Calibrage de la simulation Mini Switch
 Le but principal du traitement des données était d'extraire les moyennes des notes attribuées à chaque critère pour chaque moyen de transport à partir des réponses au questionnaire. Pour cela, nous avons pris en compte plusieurs populations :
