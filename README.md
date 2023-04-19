@@ -1,19 +1,29 @@
 # Mini Switch
+
 ## Présentation du projet
+
 Mini Switch est un système multi-agents dans lequel les agents doivent choisir un moyen de transport quotidien selon des critères. Ces critères peuvent être quantitatifs (prix de l'essence, prix de l'abonnement aux transports en commun, vitesse moyenne des moyens de transport) et qualitatifs (présence de pluie, température normale). Le choix des agents est réalisé en fonction de leur perception de l'écologie, du confort, de l'accessibilité financière, de la praticité, de la sécurité et du confort de chaque moyen de transport. Des valeurs d’importances attribuées à chaque critère sont aussi utilisées. Ces paramètres ont été estimés grâce à ce questionnaire : https://framaforms.org/modes-de-transports-et-perceptions-1679935991.
 Le projet se structure en deux grandes parties. Le développement de la simulation en Gaml et le traitement des données obtenues grâce au questionnaire en Python.
+
 ## Simulation
+
 Pour lancer la simulation, il est nécessaire d'installer la plateforme Gama : https://gama-platform.org/download. Ensuite, les modalités pour importer le projet dans la plateforme sont détaillées ici : https://gama-platform.org/wiki/ImportingModels#import-gama-project.
+
 ### Lancement de la simulation
+
 Une fois le projet importé dans la plateforme, le lancement de la simulation se fait à partir du fichier world.gaml situé à la location User models/switch_biasedAgents/models. Une fois ce fichier ouvert, un bouton vert "switch" devrait être présent en haut à gauche. L'utilisation de ce bouton permet l'ouverture de la page de lancement de la simulation.
 Sur cette page, il est possible de modifier les paramètres via les onglets de gauche. Pour que les modifications soient prises en compte, il est nécessaire de les valider dans l'onglet confirmation. Si aucune modification n'est faite, les valeurs par défaut des paramètres seront utilisées.
 Ensuite, le lancement de la simulation se fait via le bouton "run" présent en haut de la page.
+
 ### Fichiers Gaml
+
 * World.gaml : description de l'environnement de la simulation, de ses paramètres (nombre d'agents, paramètres quantitatifs et qualitatifs) et définition de l'interface graphique de la simulation.
-*Context.gaml : Définition des valeurs par défaut des paramètres de l'environnement.
-*Traveler.gaml : Description globale des agents, de leurs paramètres (préférences, notes) et de leurs comportements (choix d'un moyen de transport, biais).
+* Context.gaml : Définition des valeurs par défaut des paramètres de l'environnement.
+* Traveler.gaml : Description globale des agents, de leurs paramètres (préférences, notes) et de leurs comportements (choix d'un moyen de transport, biais).
+
 ###Dossier data
 Le dossier data contient les fichiers JSON dans lesquels sont stockées les valeurs des paramètres (préférences et notes) utilisées par les agents dans la simulation.
+
 ##Traitement des données du questionnaire
 Le traitement des données obtenues via le questionnaire se fait grâce au fichier extraction.py présent à la racine du projet. Dans la version présente sur ce dépôt, le script utilise les données présentes dans le fichier demo.csv du dossier data. Ce fichier contient des données fictives. Les véritables réponses des participants ne peuvent pas être mises à disposition sur ce dépôt pour des raisons de respect des lois portant sur l'utilisation de données personnelles.
 # Calibrage de la simulation Mini Switch
