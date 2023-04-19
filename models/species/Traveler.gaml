@@ -1,7 +1,7 @@
 /**
 * Name: traveler
 * Based on the internal empty template. 
-* Author: shloai
+* Author: Conrad Chloé 
 * Tags: 
 */
 
@@ -112,7 +112,6 @@ species traveler {
 	}
 	
 	reflex choose{
-		
 		float det <- rnd(1.0);
 		if(det < self.proportion_conf){
 			do apply_conf_bias;
@@ -140,9 +139,7 @@ species traveler {
 		}
 		
 		put  self.habits[transp_max_somme]+1 in: self.habits at: transp_max_somme;
-		
 		choice <- transp_max_somme;
-		
 	}
 	
 	action ban_with_distance {
