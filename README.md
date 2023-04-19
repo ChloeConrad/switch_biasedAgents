@@ -23,7 +23,9 @@ Le but principal du traitement des données était d'extraire les moyennes des n
 * Les répondants ayant pour moyen de transport quotidien les transports en commun.
 * Les répondants ayant pour moyen de transport quotidien le vélo.
 * Les répondants ayant pour moyen de transport quotidien la marche.
+
 Les résultats obtenus grâce à ce traitement ont été utilisés pour calibrer la simulation Mini Switch.
+
 ### Évaluation de la rationalité des participants
 
 De plus, les données disponibles nous ont permis d'évaluer le nombre de participants au questionnaire ayant fait un choix rationnel par rapport à leur réponse. Deux méthodes ont été utilisées à cet effet. La première consistait à calculer, pour chaque moyen de transport, la somme de la note attribuée par le participant à chaque critère multipliée par la valeur d'importance donnée à ce critère. La seconde méthode était similaire, mais en prenant en compte la somme de la note moyenne attribuée par l'ensemble des participants multipliée par l'importance du critère attribué par le participant. Ainsi, le moyen de transport donnant le résultat le plus élevé était considéré comme le choix rationnel pour le participant. Si ce choix diffère du moyen de transport quotidien déclaré par le participant, ce dernier était considéré comme non rationnel. Dans ce calcul, les moyens de transport déclarés comme indisponibles par le participant ne sont pas pris en compte. De plus, certains moyens de transport comme la marche ou le vélo sont éliminés en fonction de la distance séparant le lieu d'habitation et le lieu d'activité principale.
